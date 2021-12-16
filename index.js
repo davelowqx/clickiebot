@@ -1,18 +1,17 @@
 const { Telegraf, Markup } = require("telegraf");
 require("dotenv").config();
-const fetch = require("node-fetch").default;
 
-const token = process.env.BOT_TOKEN;
-if (token === undefined) {
-  throw new Error("BOT_TOKEN must be provided!");
-}
 const MESSAGE =
   "Beep boop. Tag me @passitaroundbot directly in the chat where you wish to create a board.";
 
-const bot = new Telegraf(token);
+const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.start((ctx) => ctx.reply(MESSAGE));
 bot.help((ctx) => ctx.reply(MESSAGE));
 bot.on("message", (ctx) => ctx.reply(MESSAGE));
+bot.catch((err, ctx) => {
+  console.error(err);
+  ctx.reply(`Oops, encountered error for ${ctx.updateType}`, err);
+});
 
 bot.action("me", async (ctx) => {
   console.log(ctx.update);
@@ -58,18 +57,3 @@ bot.launch();
 // Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
-
-// bot.on("message", async (ctx) => {
-//   if (ctx.message.text.split("\n").length > 1) {
-//     ctx.reply("Oops! The title must be a single line.");
-//   } else {
-//     ctx.reply("Congratulations, you have created a new board!");
-//     ctx.replyWithMarkdownV2(
-//       `${ctx.message.text}`,
-//       Markup.inlineKeyboard([
-//         Markup.button.switchToChat("Publish", ctx.message.text),
-//         Markup.button.callback("me", "me"),
-//       ])
-//     );
-//   }
-// });
