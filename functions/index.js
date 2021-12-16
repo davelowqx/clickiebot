@@ -1,9 +1,24 @@
-const functions = require("firebase-functions");
+import { Telegraf } from "telegraf";
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+const { BOT_TOKEN, FUNCTION_NAME, PROJECT_ID, REGION } = process.env;
+
+if (BOT_TOKEN === undefined) {
+  throw new TypeError("BOT_TOKEN must be provided!");
+}
+
+const bot = new Telegraf(BOT_TOKEN);
+
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
+bot.telegram.setWebhook(
+  `https://${REGION}-${PROJECT_ID}.cloudfunctions.net/${FUNCTION_NAME}`
+);
+
+bot.command("hello", (ctx) => ctx.reply("Hello, friend!"));
+
+export const botFunction = async (req, res) => {
+  try {
+    await bot.handleUpdate(req.body);
+  } finally {
+    res.status(200).end();
+  }
+};

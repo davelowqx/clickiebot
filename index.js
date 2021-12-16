@@ -6,13 +6,13 @@ const token = process.env.BOT_TOKEN;
 if (token === undefined) {
   throw new Error("BOT_TOKEN must be provided!");
 }
+const MESSAGE =
+  "Beep boop. Tag me @passitaroundbot directly in the chat where you wish to create a board.";
 
 const bot = new Telegraf(token);
-bot.start((ctx) =>
-  ctx.reply(
-    "This is an inline bot. Mention me in the group where you want to create a board."
-  )
-);
+bot.start((ctx) => ctx.reply(MESSAGE));
+bot.help((ctx) => ctx.reply(MESSAGE));
+bot.on("message", (ctx) => ctx.reply(MESSAGE));
 
 bot.action("me", async (ctx) => {
   console.log(ctx.update);
@@ -51,10 +51,6 @@ bot.on("inline_query", (ctx) => {
   } else {
     ctx.answerInlineQuery([]);
   }
-});
-
-bot.on("chosen_inline_result", ({ chosenInlineResult }) => {
-  console.log("chosen inline result", chosenInlineResult);
 });
 
 bot.launch();
